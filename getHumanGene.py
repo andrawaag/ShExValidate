@@ -11,7 +11,8 @@ sparql .setQuery("""
 PREFIX wdt: <http://www.wikidata.org/prop/direct/>
 PREFIX wd: <http://www.wikidata.org/entity/>
 SELECT * WHERE {
-   ?item wdt:P699 ?doid .
+   ?item wdt:P351 ?entrez ;
+         wdt:P703 wd:Q15978631 .
 }
 
 """)
@@ -44,16 +45,16 @@ for result in results["results"]["bindings"]:
     sparql.setReturnFormat(RDF)
 
     wdtriples = sparql.query().convert()
-    wdtriples.serialize("test.nt", format="nt")
-    os.chmod("test.nt", 776)
+    wdtriples.serialize("test.ttl", format="turtle")
+    os.chmod("test.ttl", 776)
 
-    args = shlex.split("/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-disease.shex test.nt")
+    args = shlex.split("/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-human_gene.shex test.ttl")
     # print(args)
     output = None
     try:
         p = subprocess.check_output(args)
     except subprocess.CalledProcessError as grepexc:
-        # pprint.pprint(grepexc.output.decode("utf-8"))
+        pprint.pprint(grepexc.output.decode("utf-8"))
         output = json.loads(grepexc.output)
 
 
