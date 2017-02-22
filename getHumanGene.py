@@ -48,8 +48,8 @@ for result in results["results"]["bindings"]:
     wdtriples.serialize("test.ttl", format="turtle")
     os.chmod("test.ttl", 776)
 
-    args = shlex.split("/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-human_gene.shex test.ttl")
-    # print(args)
+    args = shlex.split("/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-human_gene.shex -n "+result["item"]["value"]+" -d test.ttl")
+    print(args)
     output = None
     try:
         p = subprocess.check_output(args)

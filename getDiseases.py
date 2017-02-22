@@ -44,11 +44,12 @@ for result in results["results"]["bindings"]:
     sparql.setReturnFormat(RDF)
 
     wdtriples = sparql.query().convert()
-    wdtriples.serialize("test.nt", format="nt")
+    wdtriples.serialize("test.ttl", format="turtle")
     os.chmod("test.nt", 776)
-
-    args = shlex.split("/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-disease.shex test.nt")
-    # print(args)
+    cmd = "/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-disease.shex test.ttl -n "+result["item"]["value"]
+    args = shlex.split(cmd)
+    print(args)
+    print(cmd)
     output = None
     try:
         p = subprocess.check_output(args)
