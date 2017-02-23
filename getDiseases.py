@@ -56,11 +56,9 @@ for result in results["results"]["bindings"]:
         # pprint.pprint(grepexc.output.decode("utf-8"))
         output = json.loads(grepexc.output)
 
-
-
     if output != None:
-       pprint.pprint(output)
-       """ for error in output["errors"]:
+        pprint.pprint(output)
+           """ for error in output["errors"]:
             print("Item: "+result["item"]["value"])
             print("===============")
             print("Property: "+error["constraint"]["predicate"])
