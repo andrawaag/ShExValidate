@@ -18,7 +18,6 @@ SELECT * WHERE {
 sparql.setReturnFormat(JSON)
 results = sparql.query().convert()
 
-
 for result in results["results"]["bindings"]:
     wdid = result["item"]["value"].replace("http://www.wikidata.org/entity/", "")
     query = """
@@ -48,8 +47,8 @@ for result in results["results"]["bindings"]:
     os.chmod("test.nt", 776)
     cmd = "/Users/andra/projects/shex.js/bin/validate -x /Users/andra/projects/ShEx/wikidata/wikidata-disease.shex test.ttl -n "+result["item"]["value"]
     args = shlex.split(cmd)
-    print(args)
-    print(cmd)
+    #print(args)
+    #print(cmd)
     output = None
     try:
         p = subprocess.check_output(args)
@@ -58,8 +57,16 @@ for result in results["results"]["bindings"]:
         output = json.loads(grepexc.output)
 
 
-    pprint.pprint(output)
-    sys.exit()
 
+    if output != None:
+       pprint.pprint(output)
+       """ for error in output["errors"]:
+            print("Item: "+result["item"]["value"])
+            print("===============")
+            print("Property: "+error["constraint"]["predicate"])
+            for error2 in error["errors"]:
+                print(error2["type"])
+                print(error2["valueExpr"]["type"])
+        """
 
 
