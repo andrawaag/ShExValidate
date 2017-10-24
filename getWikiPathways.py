@@ -18,7 +18,7 @@ SELECT ?pathway WHERE {
 """)
 sparql.setReturnFormat(JSON)
 results = sparql.query().convert()
-
+html_list = []
 htmloutput = open("/tmp/pathway_errors.html", "w")
 htmloutput.write("<html><head></head><body><h1>Validation report</h1> <ul>")
 
@@ -27,8 +27,8 @@ def findPropertyError(error, error_report):
         if "property" in error.keys():
             if error["property"] not in error_report.keys():
                 error_report[error["property"]] = error["type"]
-                htmloutput.write(error["type"] + ":")
-                htmloutput.write(error["property"])
+                html_list.append(error["type"] + ":")
+                html_list.append(error["property"])
                 print(error["property"] + ": " + error["type"])
             row = []
             row.append(error["property"])
@@ -41,8 +41,8 @@ def findPropertyError(error, error_report):
             if "property" in error_part.keys():
                 if error_part["property"] not in error_report.keys():
                     error_report[error_part["property"]] = error_part["type"]
-                    htmloutput.write(error_part["type"] + ":")
-                    htmloutput.write(error_part["property"]+"<br>")
+                    html_list.append(error_part["type"] + ":")
+                    html_list.append(error_part["property"]+"<br>")
                     print(error_part["property"] + ": " + error_part["type"])
                 row = []
                 row.append(error_part["property"])
@@ -54,6 +54,10 @@ def findPropertyError(error, error_report):
     else:
         print(type(error))
    #elif type(error) is list
+
+ok = 0
+warning = 0
+total = 0
 
 for result in results["results"]["bindings"]:
     wdid = result["pathway"]["value"].replace("http://www.wikidata.org/entity/", "")
@@ -74,16 +78,27 @@ for result in results["results"]["bindings"]:
 
     if output == None:
         table_data.append(["no issue with: " +wdid])
-        htmloutput.write("<li><a href = \"http://www.wikidata.org/entity/"+wdid+"\">"+wdid+"</a><img src = \"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Approve_icon.svg/200px-Approve_icon.svg.png\" width=20\">")
+        ok += 1
+        total += 1
+        html_list.append("<li><a href = \"http://www.wikidata.org/entity/"+wdid+"\">"+wdid+"</a><img src = \"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Approve_icon.svg/200px-Approve_icon.svg.png\" width=20\">")
+        # htmloutput.write("<li><a href = \"http://www.wikidata.org/entity/"+wdid+"\">"+wdid+"</a><img src = \"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Approve_icon.svg/200px-Approve_icon.svg.png\" width=20\">")
     else:
         #pprint.pprint(output)
-        htmloutput.write("<li><a href = \"http://www.wikidata.org/entity/" + wdid + "\">" + wdid + "</a><img src = \"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Emojione_26A1.svg/768px-Emojione_26A1.svg.png\" width=20\">")
+        warning += 1
+        total += 1
+        html_list.append("<li><a href = \"http://www.wikidata.org/entity/" + wdid + "\">" + wdid + "</a><img src = \"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Emojione_26A1.svg/768px-Emojione_26A1.svg.png\" width=20\">")
 
         print("Issue with "+wdid)
         print("There are iseues on property:")
         pprint.pprint(output)
         error_report = dict()
         findPropertyError(output, error_report)
+
+htmloutput.write("<table><tr><td>Pass</td><td>"+str(ok)+"</td></tr>")
+htmloutput.write("<tr><td>Fail</td><td>"+str(warning)+"</td></tr>")
+htmloutput.write("<tr><td>Total</td><td>"+str(total)+"</td></tr></table>    ")
+for line in html_list:
+    htmloutput.write(line)
 
 htmloutput.write("</ul></body>")
 htmloutput.close()
